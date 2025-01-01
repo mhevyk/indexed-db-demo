@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
+    <script>
+      Dexie.delete("FriendDatabase").then(() => {
+        // Reinitialize the database
+        const db = new Dexie("FriendDatabase");
+        db.version(1).stores({
+          friends: "++id, age",
+        });
+
+        // Add data and query it
+        db.friends
+          .bulkAdd([
+            { name: "Alice", age: 21 },
+            { name: "Max", age: 20 },
+            { name: "Sofia", age: 70 },
+          ])
+          .then(() => {
+            return db.friends.where("age").below(30).toArray();
+          })
+          .then((youngFriends) => {
+            console.log("My young friends:", youngFriends);
+          })
+          .catch((e) => {
+            console.log(`Oops: ${e}`);
+          });
+      });
+    </script>
+  </head>
+</html>
